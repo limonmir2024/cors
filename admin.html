@@ -1,23 +1,200 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Panel</title>
-  <style>
-    body { font-family: Arial; background: #fee; padding: 20px; }
-    h1 { color: #900; }
-    .box { background: #fff; padding: 15px; margin: 15px 0; border-radius: 8px; }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Panel — Secure Courses</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style> body{background:linear-gradient(180deg,#061023,#081534);} .glass{background:rgba(255,255,255,0.03);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.04);} </style>
 </head>
-<body>
-  <h1>এডমিন প্যানেল</h1>
-  <div class="box">
-    <h2>পেমেন্ট ভেরিফাই</h2>
-    <p>ইউজারের সাবমিট করা ট্রানজেকশন আইডি এখানে লিস্ট হবে। (ডেমো)</p>
-  </div>
-  <div class="box">
-    <h2>কোর্স ম্যানেজ</h2>
-    <p>তুমি চাইলে নতুন কোর্স এড/ডিলিট করতে পারো।</p>
-  </div>
+<body class="min-h-screen text-slate-100 antialiased">
+  <header class="py-5">
+    <div class="max-w-6xl mx-auto px-6 flex items-center justify-between">
+      <div class="flex items-center gap-3"><div class="w-10 h-10 bg-gradient-to-br from-sky-400 to-indigo-600 rounded-lg grid place-items-center font-bold text-slate-900">EH</div><h1 class="text-lg font-semibold">Admin Panel</h1></div>
+      <div><a href="index.html" class="px-3 py-2 rounded-md hover:bg-white/5">বাণিজ্যিক ভিউ</a></div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 pb-12">
+    <section id="loginBox" class="glass p-6 rounded-xl max-w-md mx-auto">
+      <h2 class="text-xl font-semibold mb-3">Admin Login</h2>
+      <form id="adminLogin" class="space-y-3">
+        <input id="a_email" placeholder="Admin Email" class="w-full px-3 py-2 rounded bg-white/3" required value="admin@site.local" />
+        <input id="a_pass" type="password" placeholder="Password" class="w-full px-3 py-2 rounded bg-white/3" required />
+        <div class="flex gap-2">
+          <button class="flex-1 py-2 rounded bg-indigo-500 text-slate-900">Login</button>
+          <button type="button" id="demoAdmin" class="flex-1 py-2 rounded border border-white/10">Demo</button>
+        </div>
+      </form>
+      <p class="text-slate-400 text-sm mt-2">ডিফল্ট ডেমো: admin@site.local / admin123 — লাইভ নেওয়ার আগে ক্রেডেনশিয়াল বদলে নেবে।</p>
+    </section>
+
+    <section id="adminArea" class="hidden mt-8 grid md:grid-cols-2 gap-6">
+      <div class="glass p-6 rounded-xl">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-semibold">Pending Payments</h3>
+          <div class="text-sm text-slate-400">Verify transactions manually</div>
+        </div>
+        <div id="paymentsList" class="space-y-3 text-slate-300">No pending payments</div>
+      </div>
+
+      <div class="glass p-6 rounded-xl">
+        <h3 class="font-semibold mb-3">Course Management</h3>
+        <form id="courseForm" class="space-y-2">
+          <input id="ctitle" placeholder="Course Title" class="w-full px-3 py-2 rounded bg-white/3" />
+          <input id="cprice" type="number" placeholder="Price (BDT)" class="w-full px-3 py-2 rounded bg-white/3" />
+          <textarea id="cdesc" rows="3" placeholder="Description (defensive focus)" class="w-full px-3 py-2 rounded bg-white/3"></textarea>
+          <div class="flex gap-2">
+            <button type="submit" class="flex-1 py-2 rounded bg-emerald-400 text-slate-900">Add Course</button>
+            <button type="button" id="exportBtn" class="flex-1 py-2 rounded border border-white/10">Export DB</button>
+          </div>
+        </form>
+
+        <hr class="my-4 border-white/5">
+
+        <h4 class="font-semibold mb-2">Admin Controls</h4>
+        <div class="text-slate-400 text-sm mb-3">Change admin email/password for production</div>
+        <div class="flex gap-2">
+          <input id="setAdminEmail" placeholder="new admin email" class="flex-1 px-3 py-2 rounded bg-white/3" />
+          <input id="setAdminPass" placeholder="new password" class="flex-1 px-3 py-2 rounded bg-white/3" />
+        </div>
+        <div class="flex gap-2 mt-3">
+          <button id="saveAdmin" class="py-2 rounded bg-indigo-500 text-slate-900 flex-1">Save</button>
+          <button id="wipe" class="py-2 rounded bg-rose-600 flex-1">Wipe All (danger)</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="text-center text-slate-500 py-6">© <span id="yyyy"></span> Admin — Secure Courses</footer>
+
+  <script>
+    // Keys should match user.html
+    const KEY_USERS = 'eh_users_v2';
+    const KEY_COURSES = 'eh_courses_v2';
+    const KEY_ENROLLS = 'eh_enrolls_v2';
+    const KEY_SESSION = 'eh_session_v2';
+
+    // Demo admin
+    const DEMO = { email: 'admin@site.local', pass: 'admin123' };
+
+    // util
+    const $ = id => document.getElementById(id);
+    function uid(){ return Math.random().toString(36).slice(2,10); }
+
+    // ensure seed courses exist
+    if(!localStorage.getItem(KEY_COURSES)){
+      const seed = [
+        { id: 'c1', title: 'গেলারী হ্যাক', price: 550, desc: 'প্রাইভেসি ও ডাটা-প্রোটেকশন (সেফটি ফোকাস)' },
+        { id: 'c2', title: 'ডিভাইস ফুল কন্ট্রল', price: 1020, desc: 'Consent-based MDM ও রিমোট সাপোর্ট' },
+        { id: 'c3', title: 'ফেসবুক হ্যাক', price: 670, desc: 'অ্যাকাউন্ট সিকিউরিটি ও রিকভারি' },
+        { id: 'c4', title: 'লিংক পাঠিয়ে ফুন হ্যাক', price: 1250, desc: 'ফিশিং ডিফেন্স ও লিংক অ্যানালাইসিস' },
+        { id: 'c5', title: 'Pdf ভাইরাস তৈরি', price: 720, desc: 'PDF সেফটি, ডিটেকশন ও হার্ডেনিং' },
+      ];
+      localStorage.setItem(KEY_COURSES, JSON.stringify(seed));
+    }
+
+    // elements
+    const loginBox = $('loginBox'), adminArea = $('adminArea');
+    const adminLogin = $('adminLogin'), demoAdmin = $('demoAdmin'), paymentsList = $('paymentsList');
+    const courseForm = $('courseForm'), exportBtn = $('exportBtn');
+    const saveAdmin = $('saveAdmin'), wipe = $('wipe');
+
+    // login
+    adminLogin.addEventListener('submit', e=>{
+      e.preventDefault();
+      const em = $('a_email').value.trim(), pw = $('a_pass').value;
+      const storedAdminEmail = localStorage.getItem('eh_admin_email') || DEMO.email;
+      const storedAdminPass = localStorage.getItem('eh_admin_pass') || DEMO.pass;
+      if(em === storedAdminEmail && pw === storedAdminPass){
+        // mark session (serverless demo)
+        localStorage.setItem(KEY_SESSION, JSON.stringify({ id: 'admin_local', name: 'Admin', email: em, role: 'admin' }));
+        showAdmin();
+      } else alert('ভুল ক্রেডেনশিয়াল');
+    });
+
+    demoAdmin.addEventListener('click', ()=>{ $('a_email').value = DEMO.email; $('a_pass').value = DEMO.pass; });
+
+    function showAdmin(){
+      loginBox.classList.add('hidden');
+      adminArea.classList.remove('hidden');
+      renderPending();
+    }
+
+    // render pending payments
+    function renderPending(){
+      const enrolls = JSON.parse(localStorage.getItem(KEY_ENROLLS) || '[]');
+      if(enrolls.length === 0){ paymentsList.innerHTML = '<div class="text-slate-400">No transactions yet</div>'; return; }
+      const pending = enrolls.filter(e => e.payment && e.status === 'pending');
+      if(pending.length === 0){ paymentsList.innerHTML = '<div class="text-slate-400">No pending payments</div>'; return; }
+      paymentsList.innerHTML = '';
+      const users = JSON.parse(localStorage.getItem(KEY_USERS) || '[]');
+      const courses = JSON.parse(localStorage.getItem(KEY_COURSES) || '[]');
+      for(const p of pending){
+        const u = users.find(x => x.id === p.userId) || { name: 'Unknown' };
+        const c = courses.find(x => x.id === p.courseId) || { title: 'Unknown' };
+        const div = document.createElement('div');
+        div.className = 'p-3 rounded border border-white/5 flex justify-between items-center';
+        div.innerHTML = `<div>
+            <div class="font-medium">${u.name} — <span class="text-slate-400 text-sm">${c.title}</span></div>
+            <div class="text-xs text-slate-400 mt-1">Method: ${p.payment.method} • Trx: ${p.payment.trx}</div>
+          </div>
+          <div class="flex gap-2">
+            <button class="px-3 py-1 rounded bg-emerald-400 text-slate-900" onclick='approve("${p.id}")'>Approve</button>
+            <button class="px-3 py-1 rounded border border-white/10" onclick='reject("${p.id}")'>Reject</button>
+          </div>`;
+        paymentsList.appendChild(div);
+      }
+    }
+
+    // approve / reject
+    window.approve = function(id){
+      const enrolls = JSON.parse(localStorage.getItem(KEY_ENROLLS) || '[]');
+      const e = enrolls.find(x => x.id === id);
+      if(e){ e.status = 'approved'; localStorage.setItem(KEY_ENROLLS, JSON.stringify(enrolls)); renderPending(); alert('Approved ✅'); }
+    }
+    window.reject = function(id){
+      if(!confirm('Reject this payment?')) return;
+      const enrolls = JSON.parse(localStorage.getItem(KEY_ENROLLS) || '[]');
+      const idx = enrolls.findIndex(x => x.id === id);
+      if(idx >= 0){ enrolls.splice(idx,1); localStorage.setItem(KEY_ENROLLS, JSON.stringify(enrolls)); renderPending(); alert('Rejected / removed'); }
+    }
+
+    // add course
+    courseForm.addEventListener('submit', e=>{
+      e.preventDefault();
+      const ct = $('ctitle').value.trim(), pr = Number($('cprice').value) || 0, dc = $('cdesc').value.trim();
+      if(!ct || pr <= 0){ alert('শিরোনাম ও সঠিক দাম দিন'); return; }
+      const cs = JSON.parse(localStorage.getItem(KEY_COURSES) || '[]');
+      cs.push({ id: uid(), title: ct, price: pr, desc: dc });
+      localStorage.setItem(KEY_COURSES, JSON.stringify(cs));
+      alert('Course added ✅');
+    });
+
+    exportBtn.addEventListener('click', ()=>{
+      const users = JSON.parse(localStorage.getItem(KEY_USERS) || '[]');
+      const courses = JSON.parse(localStorage.getItem(KEY_COURSES) || '[]');
+      const enrolls = JSON.parse(localStorage.getItem(KEY_ENROLLS) || '[]');
+      const blob = new Blob([JSON.stringify({ users, courses, enrolls }, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'eh-backup.json'; a.click();
+    });
+
+    // admin save
+    saveAdmin.addEventListener('click', ()=>{
+      const em = $('setAdminEmail').value.trim(), pw = $('setAdminPass').value.trim();
+      if(em) localStorage.setItem('eh_admin_email', em);
+      if(pw) localStorage.setItem('eh_admin_pass', pw);
+      alert('Admin credentials updated (client-side).');
+    });
+
+    // wipe all
+    wipe.addEventListener('click', ()=>{
+      if(!confirm('সব ডাটা মুছে যাবে — আপনি কি নিশ্চিত?')) return;
+      localStorage.removeItem(KEY_USERS); localStorage.removeItem(KEY_COURSES); localStorage.removeItem(KEY_ENROLLS); localStorage.removeItem(KEY_SESSION);
+      alert('All data wiped. Reloading.'); location.reload();
+    });
+
+    document.getElementById('yyyy').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
