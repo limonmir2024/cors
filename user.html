@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>User Panel</title>
+  <style>
+    body { font-family: Arial; background: #eef; padding: 20px; }
+    h1 { color: #333; }
+    .box { background: #fff; padding: 15px; margin: 15px 0; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>ইউজার প্যানেল</h1>
+  <div class="box">
+    <h2>আমার কোর্স</h2>
+    <p>আপনি এখনো কোনো কোর্স এনরোল করেননি।</p>
+  </div>
+  <div class="box">
+    <h2>পেমেন্ট সাবমিট</h2>
+    <form id="paymentForm">
+      <label>ট্রানজেকশন আইডি:</label><br>
+      <input type="text" id="trxid" required><br><br>
+      <button type="submit">সাবমিট</button>
+    </form>
+  </div>
+  <script>
+    document.getElementById("paymentForm").onsubmit = function(e){
+      e.preventDefault();
+      let trx = document.getElementById("trxid").value;
+      alert("পেমেন্ট সাবমিট হয়েছে: " + trx + " (এডমিন ভেরিফাই করবে)");
+    }
+  </script>
+</body>
+</html>
