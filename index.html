@@ -1,37 +1,118 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <title>হ্যাকিং কোর্স ওয়েবসাইট</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Secure Hacking Courses — Home</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
-    header { background: #222; color: #fff; padding: 15px; text-align: center; }
-    nav { margin: 15px; text-align: center; }
-    nav a { margin: 10px; text-decoration: none; color: #333; font-weight: bold; }
-    .course { background: #fff; margin: 15px; padding: 15px; border-radius: 8px; }
+    /* Small styling tweaks */
+    body { background: radial-gradient(1000px 400px at 10% 10%, rgba(14,165,233,0.06), transparent), #081124; }
+    .glass { background: rgba(255,255,255,0.04); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.04); }
   </style>
 </head>
-<body>
-  <header>
-    <h1>হ্যাকিং কোর্স ওয়েবসাইট</h1>
-    <p>ইউজার লগইন / রেজিস্টার করুন</p>
-  </header>
-  <nav>
-    <a href="user.html">ইউজার লগইন</a>
-    <a href="admin.html">এডমিন লগইন</a>
-  </nav>
-  <main>
-    <div class="course">
-      <h2>কোর্স তালিকা</h2>
-      <ul>
-        <li>📸 গেলারী হ্যাক — 550 টাকা</li>
-        <li>📱 ডিভাইস ফুল কন্ট্রল — 1020 টাকা</li>
-        <li>🔒 ফেসবুক হ্যাক — 670 টাকা</li>
-        <li>📩 লিংক পাঠিয়ে ফুন হ্যাক — 1250 টাকা</li>
-        <li>📑 Pdf ভাইরাস তৈরি — 720 টাকা</li>
-      </ul>
-      <p><b>পেমেন্ট নাম্বার:</b> বিকাশ/নগদ 01932566013</p>
+<body class="min-h-screen text-slate-100 antialiased">
+  <header class="py-6">
+    <div class="max-w-6xl mx-auto px-6 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-indigo-600 grid place-items-center text-slate-900 font-extrabold">EH</div>
+        <div>
+          <h1 class="text-2xl font-semibold">Ethical Hacking Courses</h1>
+          <p class="text-sm text-slate-400">Educational • Legal • Defensive</p>
+        </div>
+      </div>
+      <nav class="flex items-center gap-3">
+        <a href="index.html" class="text-slate-200 px-3 py-2 rounded-md hover:bg-white/5">হোম</a>
+        <a href="user.html" class="px-3 py-2 rounded-md bg-slate-200 text-slate-900 font-medium">ইউজার প্যানেল</a>
+        <a href="admin.html" class="px-3 py-2 rounded-md hover:bg-white/5">এডমিন</a>
+      </nav>
     </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 pb-12">
+    <section class="grid md:grid-cols-2 gap-6 items-start">
+      <div class="glass p-6 rounded-xl">
+        <h2 class="text-2xl font-semibold mb-2">শুরু করুন প্রফেশনালি</h2>
+        <p class="text-slate-300 mb-4">কোর্সগুলো লিগ্যাল ও সিকিউরিটি-ফোকাসড — প্রাইভেসি, ডিফেন্স এবং রিকভারি শিখবে। পেমেন্ট নম্বর: <b class="text-indigo-300">01932566013</b> (bKash / Nagad)</p>
+        <a href="user.html" class="inline-block mt-2 px-4 py-2 bg-indigo-500 rounded-md font-medium text-slate-900">একাউন্ট খুলে এনরোল করো</a>
+      </div>
+
+      <div class="glass p-6 rounded-xl">
+        <h3 class="text-lg font-semibold mb-2">কীভাবে পেমেন্ট কাজ করবে</h3>
+        <ol class="list-decimal list-inside text-slate-300 space-y-1">
+          <li>পছন্দের কোর্স ইনকোয়্যার/এনরোল করো।</li>
+          <li>বিকাশ/নগদে টাকা পাঠাও — নম্বর: <span class="font-semibold text-indigo-200">01932566013</span>.</li>
+          <li>Transaction ID ইউজার প্যানেলে সাবমিট করো — এডমিন ভেরিফাই করবে।</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="mt-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">কোর্স লিস্ট</h2>
+        <input id="search" type="text" placeholder="কোর্স খুঁজুন..." class="px-3 py-2 rounded-md bg-white/5 border border-white/5 text-slate-100"/>
+      </div>
+
+      <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- cards injected by JS -->
+      </div>
+    </section>
+
+    <section class="mt-10 text-center text-slate-400">
+      <p>প্রফেশনাল লুক লাগছে না? বললে আমি UI/UX আরো পালিশ করে দিব — ফ্রি পরামর্শও দিব :)</p>
+    </section>
   </main>
+
+  <footer class="border-t border-white/5 py-6 text-center text-slate-500">
+    © <span id="year"></span> Secure Hacking Courses — Educational & Defensive Only.
+  </footer>
+
+  <script>
+    /* Data (titles/prices as you gave). Descriptions are defensive/legal. */
+    const COURSES = [
+      { id: 'c1', title: 'গেলারী হ্যাক', price: 550, desc: 'প্রাইভেসি ও ডাটা-প্রোটেকশন — পারমিশন, নিরাপদ ব্যাকআপ ও কেস-রিকভারি (শুধু সেফটি অ্যান্ড লিগ্যাল)।' },
+      { id: 'c2', title: 'ডিভাইস ফুল কন্ট্রল', price: 1020, desc: 'কনসেন্ট-ভিত্তিক ডিভাইস ম্যানেজমেন্ট (MDM) ও রিমোট সাপোর্ট—লিগ্যাল কনফিগ եւ পলিসি।' },
+      { id: 'c3', title: 'ফেসবুক হ্যাক', price: 670, desc: 'অ্যাকাউন্ট সিকিউরিটি ও রিকভারি — 2FA, রিপোর্টিং, রিকভারি ফ্লো (ডিফেন্স ফোকাস)।' },
+      { id: 'c4', title: 'লিংক পাঠিয়ে ফুন হ্যাক', price: 1250, desc: 'ফিশিং ডিফেন্স ও লিংক অ্যানালাইসিস — ম্যালিশিয়াস লিংক শনাক্ত ও প্রতিরোধ কৌশল।' },
+      { id: 'c5', title: 'Pdf ভাইরাস তৈরি', price: 720, desc: 'PDF সেফটি ও ডিটেকশন — এক্সপ্লয়েট বোঝা (স্যান্ডবক্স), ডকুমেন্ট হার্ডেনিং কৌশল।' },
+    ];
+
+    const grid = document.getElementById('grid');
+    const search = document.getElementById('search');
+
+    function renderCards(q='') {
+      grid.innerHTML = '';
+      const list = COURSES.filter(c => c.title.toLowerCase().includes(q.toLowerCase()));
+      for (const c of list) {
+        const el = document.createElement('article');
+        el.className = 'glass p-5 rounded-xl';
+        el.innerHTML = `
+          <h3 class="text-lg font-semibold mb-1">${c.title}</h3>
+          <p class="text-sm text-slate-300 mb-3">${c.desc}</p>
+          <div class="flex items-center justify-between">
+            <div><span class="text-indigo-200 font-bold">৳${c.price}</span></div>
+            <div class="flex gap-2">
+              <a href="user.html" class="px-3 py-2 rounded-md bg-emerald-400 text-slate-900 font-medium">এনরোল</a>
+              <button onclick="quickPreview('${c.id}')" class="px-3 py-2 rounded-md border border-white/10">বিস্তারিত</button>
+            </div>
+          </div>`;
+        grid.appendChild(el);
+      }
+    }
+
+    function quickPreview(id) {
+      const c = COURSES.find(x => x.id === id);
+      alert(`${c.title} — ${c.desc}\nফি: ৳${c.price}\nপেমেন্ট নম্বর: 01932566013 (bKash/Nagad)`);
+    }
+
+    search.addEventListener('input', e => renderCards(e.target.value));
+    renderCards();
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Save initial courses to localStorage if not present for other pages
+    if (!localStorage.getItem('eh_courses')) {
+      localStorage.setItem('eh_courses', JSON.stringify(COURSES));
+    }
+  </script>
 </body>
 </html>
