@@ -1,34 +1,215 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <title>User Panel</title>
-  <style>
-    body { font-family: Arial; background: #eef; padding: 20px; }
-    h1 { color: #333; }
-    .box { background: #fff; padding: 15px; margin: 15px 0; border-radius: 8px; }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>User Panel — Secure Courses</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style> body { background: linear-gradient(180deg,#071024,#081530); } .glass{ background: rgba(255,255,255,0.03); backdrop-filter: blur(6px); border:1px solid rgba(255,255,255,0.04); } </style>
 </head>
-<body>
-  <h1>ইউজার প্যানেল</h1>
-  <div class="box">
-    <h2>আমার কোর্স</h2>
-    <p>আপনি এখনো কোনো কোর্স এনরোল করেননি।</p>
-  </div>
-  <div class="box">
-    <h2>পেমেন্ট সাবমিট</h2>
-    <form id="paymentForm">
-      <label>ট্রানজেকশন আইডি:</label><br>
-      <input type="text" id="trxid" required><br><br>
-      <button type="submit">সাবমিট</button>
-    </form>
-  </div>
+<body class="min-h-screen text-slate-100 antialiased">
+  <header class="py-5">
+    <div class="max-w-5xl mx-auto px-6 flex items-center justify-between">
+      <div class="flex items-center gap-3"><div class="w-10 h-10 bg-gradient-to-br from-sky-400 to-indigo-600 rounded-lg grid place-items-center font-bold text-slate-900">EH</div><div><h1 class="text-lg font-semibold">User Panel</h1><p class="text-sm text-slate-400">Login / Register • Enroll • Submit payment</p></div></div>
+      <div class="flex gap-3">
+        <a href="index.html" class="px-3 py-2 rounded-md hover:bg-white/5">হোম</a>
+        <a href="admin.html" class="px-3 py-2 rounded-md hover:bg-white/5">এডমিন</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6 pb-12">
+    <section id="authArea" class="grid md:grid-cols-2 gap-6">
+      <!-- register / login panels -->
+      <div class="glass p-6 rounded-xl">
+        <h2 class="text-lg font-semibold mb-3">নতুন ইউজার? Register</h2>
+        <form id="regForm" class="space-y-3">
+          <input id="r_name" placeholder="নাম" class="w-full px-3 py-2 rounded bg-white/3" required />
+          <input id="r_email" placeholder="ইমেইল" class="w-full px-3 py-2 rounded bg-white/3" required />
+          <input id="r_pass" type="password" placeholder="পাসওয়ার্ড" class="w-full px-3 py-2 rounded bg-white/3" required />
+          <button type="submit" class="w-full py-2 rounded bg-emerald-400 text-slate-900 font-medium">Create account</button>
+        </form>
+      </div>
+
+      <div class="glass p-6 rounded-xl">
+        <h2 class="text-lg font-semibold mb-3">Login</h2>
+        <form id="loginForm" class="space-y-3">
+          <input id="l_email" placeholder="ইমেইল" class="w-full px-3 py-2 rounded bg-white/3" required />
+          <input id="l_pass" type="password" placeholder="পাসওয়ার্ড" class="w-full px-3 py-2 rounded bg-white/3" required />
+          <div class="flex gap-2">
+            <button type="submit" class="flex-1 py-2 rounded bg-indigo-500 text-slate-900 font-medium">Login</button>
+            <button type="button" id="demoLogin" class="flex-1 py-2 rounded border border-white/10">Demo Admin</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section id="dash" class="mt-8 hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">Welcome, <span id="userName"></span></h2>
+        <div class="flex gap-3">
+          <button id="logoutBtn" class="px-3 py-2 rounded bg-rose-500">Logout</button>
+          <a href="index.html" class="px-3 py-2 rounded border border-white/10">Back</a>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="glass p-6 rounded-xl">
+          <h3 class="font-semibold mb-3">My Enrollments</h3>
+          <div id="enrollList" class="space-y-3 text-slate-300">No enrollments yet.</div>
+        </div>
+
+        <div class="glass p-6 rounded-xl">
+          <h3 class="font-semibold mb-3">Payment Submission</h3>
+          <p class="text-sm text-slate-400 mb-2">পেমেন্ট নম্বর: <b>01932566013</b> (bKash / Nagad)</p>
+          <label class="text-sm block mb-1">Choose Enrollment</label>
+          <select id="payEnroll" class="w-full px-3 py-2 rounded bg-white/3 mb-3"></select>
+          <label class="text-sm block mb-1">Method</label>
+          <select id="payMethod" class="w-full px-3 py-2 rounded bg-white/3 mb-3"><option>bKash</option><option>Nagad</option></select>
+          <input id="payTrx" placeholder="Transaction ID" class="w-full px-3 py-2 rounded bg-white/3 mb-3" />
+          <input id="paySS" placeholder="Screenshot URL (optional)" class="w-full px-3 py-2 rounded bg-white/3 mb-3" />
+          <button id="submitPay" class="w-full py-2 rounded bg-emerald-400 text-slate-900 font-medium">Submit Payment</button>
+          <p class="text-xs text-slate-500 mt-2">Payment will be verified by admin manually.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="text-center text-slate-500 py-8">© <span id="yy"></span> Secure Courses — Legal & Defensive Only</footer>
+
   <script>
-    document.getElementById("paymentForm").onsubmit = function(e){
+    // LocalStorage keys
+    const KEY_USERS = 'eh_users_v2';
+    const KEY_COURSES = 'eh_courses_v2';
+    const KEY_ENROLLS = 'eh_enrolls_v2';
+    const KEY_SESSION = 'eh_session_v2';
+
+    // Admin credentials (demo). Change on admin.html when moving live.
+    const ADMIN_DEMO = { email: 'admin@site.local', password: 'admin123', name: 'Admin' };
+
+    // initial seed for courses (kept defensive)
+    const seedCourses = [
+      { id: 'c1', title: 'গেলারী হ্যাক', price: 550, desc: 'প্রাইভেসি ও ডাটা-প্রোটেকশন (সেফটি ফোকাস)' },
+      { id: 'c2', title: 'ডিভাইস ফুল কন্ট্রল', price: 1020, desc: 'Consent-based MDM ও রিমোট সাপোর্ট (লিগ্যাল)' },
+      { id: 'c3', title: 'ফেসবুক হ্যাক', price: 670, desc: 'অ্যাকাউন্ট সিকিউরিটি ও রিকভারি (ডিফেন্স)' },
+      { id: 'c4', title: 'লিংক পাঠিয়ে ফুন হ্যাক', price: 1250, desc: 'ফিশিং ডিফেন্স ও লিংক অ্যানালাইসিস' },
+      { id: 'c5', title: 'Pdf ভাইরাস তৈরি', price: 720, desc: 'PDF সেফটি, ডিটেকশন ও হার্ডেনিং' },
+    ];
+
+    // util
+    const $ = id => document.getElementById(id);
+    function uid(){ return Math.random().toString(36).slice(2,10); }
+
+    // load/save
+    let users = JSON.parse(localStorage.getItem(KEY_USERS) || '[]');
+    let courses = JSON.parse(localStorage.getItem(KEY_COURSES) || 'null');
+    let enrolls = JSON.parse(localStorage.getItem(KEY_ENROLLS) || '[]');
+    let session = JSON.parse(localStorage.getItem(KEY_SESSION) || 'null');
+
+    if(!courses){ localStorage.setItem(KEY_COURSES, JSON.stringify(seedCourses)); courses = seedCourses; }
+
+    // DOM elements
+    const regForm = $('regForm'), loginForm = $('loginForm'), demoLoginBtn = $('demoLogin');
+    const authArea = $('authArea'), dash = $('dash'), userName = $('userName'), logoutBtn = $('logoutBtn');
+    const enrollList = $('enrollList'), payEnroll = $('payEnroll'), submitPay = $('submitPay');
+
+    // register
+    regForm.addEventListener('submit', e=>{
       e.preventDefault();
-      let trx = document.getElementById("trxid").value;
-      alert("পেমেন্ট সাবমিট হয়েছে: " + trx + " (এডমিন ভেরিফাই করবে)");
+      const name = $('r_name').value.trim(), email = $('r_email').value.trim(), pass = $('r_pass').value;
+      if(!name||!email||!pass){ alert('সব ঘর পূরণ করুন'); return; }
+      if(users.find(u=>u.email===email)){ alert('ইমেইল আগে আছে'); return; }
+      const u = { id: uid(), name, email, password: pass, role: 'user' };
+      users.push(u); localStorage.setItem(KEY_USERS, JSON.stringify(users));
+      // auto login
+      session = { id: u.id, name: u.name, email: u.email, role: 'user' }; localStorage.setItem(KEY_SESSION, JSON.stringify(session));
+      afterLogin();
+    });
+
+    // login
+    loginForm.addEventListener('submit', e=>{
+      e.preventDefault();
+      const email = $('l_email').value.trim(), pass = $('l_pass').value;
+      // admin quick demo (client-side only for demo)
+      if(email === ADMIN_DEMO.email && pass === ADMIN_DEMO.password){
+        session = { id: 'admin_demo', name: ADMIN_DEMO.name, email: ADMIN_DEMO.email, role: 'admin' };
+        localStorage.setItem(KEY_SESSION, JSON.stringify(session));
+        alert('Admin logged in (demo). Use admin.html for full admin features.');
+        location.href = 'admin.html';
+        return;
+      }
+      const u = users.find(x => x.email === email && x.password === pass);
+      if(!u){ alert('ভুল ইমেইল/পাসওয়ার্ড'); return; }
+      session = { id: u.id, name: u.name, email: u.email, role: u.role }; localStorage.setItem(KEY_SESSION, JSON.stringify(session));
+      afterLogin();
+    });
+
+    demoLoginBtn.addEventListener('click', ()=>{ $('l_email').value = ADMIN_DEMO.email; $('l_pass').value = ADMIN_DEMO.password; });
+
+    function afterLogin(){
+      // hide auth area, show dashboard
+      $('authArea').classList.add('hidden');
+      dash.classList.remove('hidden');
+      $('authArea').style.display = 'none';
+      $('userName').textContent = session.name;
+      $('yy').textContent = new Date().getFullYear();
+      renderEnrollments();
     }
+
+    // logout
+    logoutBtn.addEventListener('click', ()=>{ session = null; localStorage.removeItem(KEY_SESSION); location.reload(); });
+
+    // enroll and enroll list rendering (from eh_enrolls_v2)
+    function renderEnrollments(){
+      const allEnrolls = JSON.parse(localStorage.getItem(KEY_ENROLLS) || '[]');
+      const my = allEnrolls.filter(e => e.userId === session.id);
+      if(my.length === 0){ enrollList.innerHTML = '<div class="text-slate-400">You have no enrollments yet.</div>'; payEnroll.innerHTML = '<option value="">(no enrollments)</option>'; return; }
+      enrollList.innerHTML = '';
+      payEnroll.innerHTML = '';
+      for(const e of my){
+        const course = courses.find(c=>c.id === e.courseId) || { title: 'Unknown', price: 0 };
+        const div = document.createElement('div');
+        div.className = 'p-3 rounded border border-white/5';
+        div.innerHTML = `<div class="flex justify-between"><div><strong>${course.title}</strong><div class="text-sm text-slate-400">${course.price} BDT</div></div><div>${e.status === 'approved' ? '<span class="px-2 py-1 rounded bg-emerald-400 text-slate-900">Approved</span>' : '<span class="px-2 py-1 rounded bg-amber-500 text-slate-900">Pending</span>'}</div></div>`;
+        enrollList.appendChild(div);
+        const opt = document.createElement('option'); opt.value = e.id; opt.textContent = course.title; payEnroll.appendChild(opt);
+      }
+    }
+
+    // Quick: If no session, show auth; if session and user -> show dashboard
+    if(session && session.role === 'user') afterLogin();
+
+    // submit payment
+    submitPay.addEventListener('click', ()=>{
+      const sel = payEnroll.value, method = $('payMethod').value, trx = $('payTrx').value.trim(), ss = $('paySS').value.trim();
+      if(!sel || !trx){ alert('এনরোলমেন্ট সিলেক্ট ও Trx দিন'); return; }
+      const allEnrolls = JSON.parse(localStorage.getItem(KEY_ENROLLS) || '[]');
+      const e = allEnrolls.find(x => x.id === sel && x.userId === session.id);
+      if(!e){ alert('এনরোল পাওয়া যায়নি'); return;}
+      e.payment = { method, trx, ss: ss || null }; e.status = 'pending';
+      localStorage.setItem(KEY_ENROLLS, JSON.stringify(allEnrolls));
+      alert('পেমেন্ট সাবমিট হয়েছে — এডমিন ভেরিফাই করবে।');
+      $('payTrx').value = ''; $('paySS').value = '';
+      renderEnrollments();
+    });
+
+    // auto-create demo enroll link for visitors: Enroll buttons on index.html lead to user.html and expect an enrollment created there.
+    // We'll create a helper to accept query params ?enroll=c1 etc.
+    (function acceptPrefill(){
+      const params = new URLSearchParams(location.search);
+      const enrollId = params.get('enroll');
+      if(enrollId && session && session.role === 'user'){
+        // create enroll
+        const all = JSON.parse(localStorage.getItem(KEY_ENROLLS) || '[]');
+        if(!all.find(x=>x.userId === session.id && x.courseId === enrollId)){
+          const newE = { id: uid(), userId: session.id, courseId: enrollId, status: 'pending', payment: null };
+          all.push(newE);
+          localStorage.setItem(KEY_ENROLLS, JSON.stringify(all));
+          alert('You have been enrolled. Please submit payment.');
+          renderEnrollments();
+        }
+      }
+    })();
   </script>
 </body>
 </html>
